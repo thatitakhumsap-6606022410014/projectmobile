@@ -39,52 +39,71 @@ class _MyHomePageState extends State<MyHomePage> {
         showVal = num1;
       } else {
         num2 += number;
-        showVal = num2;
+        showVal = num1 + " " + operator + " " + num2;
       }
     });
   }
 
   void setOperator(String op) {
     setState(() {
-      operator = op;
+      if (num1.isNotEmpty) {
+        operator = op;
+        showVal = num1 + " " + op;
+      }
     });
   }
 
   void calculate() {
     setState(() {
-      if (num1 == "") return;
+      if (num1.isEmpty) return;
 
       if (operator == "√") {
-        result = sqrt(double.parse(num1));
+        double value = double.parse(num1);
+        if (value < 0) {
+          showVal = "Error";
+          return;
+        }
+        result = sqrt(value);
         showVal = result.toString();
         num1 = result.toString();
         operator = "";
         return;
       }
 
-      if (num2 == "") return;
+      if (num2.isEmpty) return;
+
+      double val1 = double.parse(num1);
+      double val2 = double.parse(num2);
 
       if (operator == "+") {
-        result = double.parse(num1) + double.parse(num2);
+        result = val1 + val2;
       } else if (operator == "-") {
-        result = double.parse(num1) - double.parse(num2);
+        result = val1 - val2;
       } else if (operator == "*") {
-        result = double.parse(num1) * double.parse(num2);
+        result = val1 * val2;
       } else if (operator == "/") {
-        if (double.parse(num2) != 0) {
-          result = double.parse(num1) / double.parse(num2);
+        if (val2 != 0) {
+          result = val1 / val2;
         } else {
           showVal = "Error";
+          num1 = "";
+          num2 = "";
+          operator = "";
           return;
         }
       } else if (operator == "%") {
-        result = (double.parse(num1) / 100) * double.parse(num2);
+        result = (val1 / 100) * val2;
       } else if (operator == "^") {
-        result = pow(double.parse(num1), double.parse(num2)).toDouble();
+        result = pow(val1, val2).toDouble();
       }
 
-      showVal = result.toString();
-      num1 = result.toString();
+      if (result == result.toInt()) {
+        showVal = result.toInt().toString();
+        num1 = result.toInt().toString();
+      } else {
+        showVal = result.toString();
+        num1 = result.toString();
+      }
       num2 = "";
       operator = "";
     });
@@ -121,8 +140,13 @@ class _MyHomePageState extends State<MyHomePage> {
         return;
       }
       result = sqrt(value);
-      showVal = result.toString();
-      num1 = result.toString();
+      if (result == result.toInt()) {
+        showVal = result.toInt().toString();
+        num1 = result.toInt().toString();
+      } else {
+        showVal = result.toString();
+        num1 = result.toString();
+      }
       operator = "";
     });
   }
@@ -170,14 +194,20 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                showVal,
-                style: const TextStyle(
-                  fontSize: 64,
-                  color: Color(0xFFFF6B6B),
-                  fontWeight: FontWeight.w300,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 80),
+                alignment: Alignment.center,
+                child: Text(
+                  showVal,
+                  style: const TextStyle(
+                    fontSize: 48,
+                    color: Color(0xFFFF6B6B),
+                    fontWeight: FontWeight.w300,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 60),
